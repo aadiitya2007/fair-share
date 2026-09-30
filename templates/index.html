@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow border-0">
+            <div class="card-body p-5 text-center">
+                <img src="/static/img/fair_share_logo.png" alt="Logo" class="mb-4 rounded-circle shadow-sm" width="100">
+                <h2 class="fw-bold mb-4">Welcome Back</h2>
+                <form action="/login" method="POST">
+                    <div class="form-floating mb-3">
+                        <!-- Defaulted to alice_s from our SQL sample data -->
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required value="alice_s">
+                        <label for="username">Username (e.g., alice_s)</label>
+                    </div>
+                    <button class="btn btn-primary w-100 py-2 fw-bold" type="submit">Sign in</button>
+                </form>
+                <p class="text-muted mt-4 mb-0"><small>Built by Aditya, Advait & Arnav</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
