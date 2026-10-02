@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Welcome & Global Overview -->
+<div class="mt-3 mb-4 stagger-item">
+    <h1 class="fw-bold mb-1">Welcome, {{ user.first_name }}! 👋</h1>
+    {% set net_total = global_collect - global_owe %}
+    <h4 class="fw-bold mb-1 {% if net_total > 0 %}text-positive{% elif net_total < 0 %}text-negative{% endif %}">
+        Overall Position: {% if net_total < 0 %}-{% endif %}₹<span data-countup="{{ net_total if net_total > 0 else (net_total * -1) }}">0.00</span>
+    </h4>
+    <p class="text-muted small">Here is your financial overview across all groups.</p>
+</div>
+
+<div class="row g-4 mb-5 stagger-item">
+    <!-- Left Card: To Collect -->
+    <div class="col-md-6">
+        <div class="surface-card h-100 border-start border-4 border-positive">
+            <div class="card-header border-0 pb-0">
+                <h5 class="fw-bold mb-0">Money you will get</h5>
+            </div>
+            <div class="card-body">
+                <h2 class="text-positive fw-bold money-format">₹<span data-countup="{{ global_collect }}">0.00</span></h2>
+                <p class="small text-muted mb-0">Total amount owed to you across all groups.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Right Card: To Pay -->
+    <div class="col-md-6">
+        <div class="surface-card h-100 border-start border-4 border-negative">
+            <div class="card-header border-0 pb-0">
+                <h5 class="fw-bold mb-0">Money you need to pay</h5>
+            </div>
+            <div class="card-body">
+                <h2 class="text-negative fw-bold money-format">₹<span data-countup="{{ global_owe }}">0.00</span></h2>
+                <p class="small text-muted mb-0">Total debt you owe to others across all groups.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 stagger-item">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold mb-0"><i class="bi bi-collection-fill me-2 text-brand"></i> My Groups</h4>
+            <button class="btn btn-primary-custom btn-sm px-4 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+                <i class="bi bi-plus-lg"></i> Create
+            </button>
+        </div>
+
+        <div class="row g-4">
+            {% for group in groups %}
+            <div class="col-md-6">
+                <a href="/group/{{ group.group_id }}" class="text-decoration-none">
+                    <div class="surface-card h-100">
+                        <div class="card-body p-4">
+                            <h3 class="fw-bold mb-1 text-primary">{{ group.group_name }}</h3>
+                            <p class="small text-muted mb-4"><i class="bi bi-people"></i> {{ group.member_count }} Members</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-subtle">
+                                {% if group.net_position > 0 %}
+                                    <span class="category-badge border-0"><i class="bi bi-arrow-up-right text-positive"></i> You're owed ₹{{ group.net_position }}</span>
+                                {% elif group.net_position < 0 %}
+                                    <span class="category-badge border-0"><i class="bi bi-arrow-down-right text-negative"></i> You owe ₹{{ (group.net_position * -1) }}</span>
+                                {% else %}
+                                    <span class="category-badge border-0 text-muted">View Balances</span>
+                                {% endif %}
+                                <i class="bi bi-chevron-right text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="surface-card p-5 text-center text-muted">
+                    <i class="bi bi-inbox fs-1 mb-2 d-block"></i>
+                    <h5 class="fw-bold text-primary">No groups yet</h5>
+                    <p>Create a group to start splitting bills!</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5 stagger-item">
+    <div class="col-12">
+        <div class="surface-card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <h5 class="fw-bold mb-0">Spend Trends</h5>
+                    <select id="timeFilter" class="form-select form-select-sm w-auto" onchange="updateLineChart()">
+                        <option value="day">Daily</option>
+                        <option value="week">Weekly</option>
+                        <option value="month">Monthly</option>
+                        <option value="year">Yearly</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body p-4" style="height: 320px;">
+                <canvas id="globalChart"></canvas>
+                <p id="globalChartEmpty" class="text-muted d-none text-center h-100 d-flex align-items-center justify-content-center">
+                    <span><i class="bi bi-graph-up fs-1 d-block mb-2"></i>No trend data yet.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Group Modal -->
+<div class="modal fade" id="createGroupModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="surface-card modal-content border-0">
+      <div class="modal-header border-bottom border-subtle p-4">
+        <h5 class="modal-title fw-bold">Create New Group</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="/groups/create" method="POST">
+          <div class="modal-body p-4">
+            <input type="text" name="group_name" class="form-control p-3" placeholder="Group Name (e.g. Goa Trip)" required>
+            <textarea name="description" class="form-control p-3 mt-3" placeholder="Group Description (Optional)" rows="2"></textarea>
+          </div>
+          <div class="modal-footer border-top border-subtle p-4">
+            <button type="button" class="btn btn-ghost px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary-custom px-4">Create Group</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        
+        const rawHistory = [
+        {% for item in history %}
+        {% if item.type == 'expense' %}
+        { "date": "{{ item.date }}", "amount": {{ item.amount | float }} }{% if not loop.last %},{% endif %}
+        {% endif %}
+        {% endfor %}
+        ];
+        
+        if(!rawHistory || rawHistory.length === 0) {
+            document.getElementById('globalChartEmpty').classList.remove('d-none');
+            document.getElementById('globalChart').style.display = 'none';
+            return;
+        }
+
+        let chartInstance = null;
+        const s = getComputedStyle(document.documentElement);
+
+        window.updateLineChart = function() {
+            const filter = document.getElementById('timeFilter').value;
+            const dateMap = {};
+            
+            rawHistory.forEach(i => {
+                let d = new Date(i.date.replace(' ', 'T'));
+                if(isNaN(d)) return;
+                
+                let label = '';
+                if(filter === 'day') {
+                    label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                } else if(filter === 'week') {
+                    // Start of week (Sunday)
+                    const w = new Date(d);
+                    w.setDate(d.getDate() - d.getDay());
+                    label = "Week of " + w.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                } else if(filter === 'month') {
+                    label = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                } else if(filter === 'year') {
+                    label = d.getFullYear().toString();
+                }
+                
+                dateMap[label] = (dateMap[label] || 0) + parseFloat(i.amount);
+            });
+            
+            const labels = Object.keys(dateMap).reverse();
+            const data = Object.values(dateMap).reverse();
+            
+            if(chartInstance) {
+                chartInstance.data.labels = labels;
+                chartInstance.data.datasets[0].data = data;
+                chartInstance.update();
+            } else {
+                const chartConfig = {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{ 
+                            data: data, 
+                            borderColor: s.getPropertyValue('--brand').trim(), 
+                            backgroundColor: s.getPropertyValue('--brand').trim() + '20',
+                            borderWidth: 3, 
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: s.getPropertyValue('--brand').trim()
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: s.getPropertyValue('--text-muted').trim(), maxTicksLimit: 7 } },
+                            y: { grid: { color: s.getPropertyValue('--border-default').trim(), borderDash: [5, 5] }, ticks: { color: s.getPropertyValue('--text-muted').trim(), callback: (v) => '₹' + v }, beginAtZero: true }
+                        },
+                        interaction: { mode: 'nearest', axis: 'x', intersect: false }
+                    }
+                };
+                chartInstance = new Chart(document.getElementById('globalChart').getContext('2d'), chartConfig);
+            }
+        };
+
+        updateLineChart();
+
+        let isInitialGroups = true;
+        window.addEventListener('themeChanged', () => {
+            if(isInitialGroups) { isInitialGroups = false; return; }
+            const st = getComputedStyle(document.documentElement);
+            if(chartInstance) {
+                chartInstance.options.scales.x.ticks.color = st.getPropertyValue('--text-muted').trim();
+                chartInstance.options.scales.y.ticks.color = st.getPropertyValue('--text-muted').trim();
+                chartInstance.options.scales.y.grid.color = st.getPropertyValue('--border-default').trim();
+                chartInstance.update();
+            }
+        });
+
+    } catch(e) { 
+        console.error('Chart Error:', e); 
+        document.getElementById('globalChartEmpty').classList.remove('d-none'); 
+        document.getElementById('globalChartEmpty').innerHTML = '<i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i>Chart Unavailable'; 
+        document.getElementById('globalChart').style.display = 'none'; 
+    }
+});
+</script>
+{% endblock %}

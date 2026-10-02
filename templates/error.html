@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <i class="bi bi-exclamation-triangle text-danger display-1 mb-4 d-block"></i>
+        <h1 class="fw-bold text-danger">{{ status_code }}</h1>
+        <h3 class="mb-4">Oops! Something went wrong.</h3>
+        <p class="text-muted">{{ detail }}</p>
+        <a href="/" class="btn btn-primary rounded-pill-custom px-4 mt-3">Go Back Home</a>
+    </div>
+</div>
+{% endblock %}

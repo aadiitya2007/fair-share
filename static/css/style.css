@@ -1,0 +1,198 @@
+/* ==========================================================================
+   FAIR SHARE - UNIFIED DESIGN SYSTEM
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Base Primitives */
+    --brand-500: #6366f1;
+    --brand-600: #4f46e5;
+    --green-500: #10b981;
+    --red-500: #ef4444;
+    
+    /* Light Mode Tokens (Soft tinted background) */
+    --bg-app: #f3f4f6;
+    --bg-surface: #ffffff;
+    --bg-subtle: #f8fafc;
+    --border-default: #e5e7eb;
+    --border-strong: #d1d5db;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    
+    /* Semantic Colors */
+    --positive: var(--green-500);
+    --negative: var(--red-500);
+    --brand: var(--brand-500);
+    
+    /* Avatars */
+    --avatar-1: #3b82f6;
+    --avatar-2: #ec4899;
+    --avatar-3: #f59e0b;
+    --avatar-4: #8b5cf6;
+    --avatar-5: #10b981;
+    
+    /* Shadows & Radii */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-pill: 9999px;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Tokens (Deep Indigo Family) */
+    --bg-app: #0f111a;
+    --bg-surface: #1a1d2d;
+    --bg-subtle: #23273a;
+    --border-default: #2a2f45;
+    --border-strong: #3b4261;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+}
+
+/* ==========================================================================
+   GLOBAL RESET & LAYOUT
+   ========================================================================== */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Fix navbar spacing */
+.app-navbar {
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-default);
+    padding: 0.75rem 0;
+}
+
+/* Main Container Constraint */
+.app-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1.5rem; /* Safe padding for mobile */
+}
+
+/* ==========================================================================
+   COMPONENTS
+   ========================================================================== */
+/* Cards */
+.surface-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.surface-card:hover {
+    box-shadow: var(--shadow-md);
+}
+/* Ensure headers have uniform padding */
+.surface-card .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--border-default);
+    padding: 1.25rem 1.5rem;
+}
+.surface-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Buttons */
+.btn-primary-custom {
+    background-color: var(--brand);
+    color: #ffffff !important;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    transition: transform 0.1s ease, filter 0.2s ease;
+}
+.btn-primary-custom:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+.btn-primary-custom:active:not(:disabled) {
+    transform: translateY(1px) scale(0.98);
+}
+.btn-danger-custom {
+    background-color: var(--negative);
+    color: #ffffff !important;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.btn-ghost {
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-pill);
+}
+.btn-ghost:hover {
+    background-color: var(--bg-subtle);
+    color: var(--text-primary);
+}
+
+/* Avatar Circle */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* Badges */
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-pill);
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Typography & Utilities */
+.money-format { font-variant-numeric: tabular-nums; }
+.text-positive { color: var(--positive) !important; }
+.text-negative { color: var(--negative) !important; }
+.border-subtle { border-color: var(--border-default) !important; }
+
+/* Lists */
+.list-group-item {
+    background-color: transparent;
+    border-color: var(--border-default);
+    padding: 1rem 1.5rem;
+}
+
+/* ==========================================================================
+   ANIMATIONS (Respecting prefers-reduced-motion)
+   ========================================================================== */
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center stagger-item mt-4">
+    <div class="col-md-5">
+        <div class="surface-card p-4 text-center mb-4">
+            <div class="mb-4">
+    <div class="user-avatar shadow-sm mb-3" data-name="{{ user.first_name if user.first_name else 'User' }}" style="width: 80px; height: 80px; font-size: 2.5rem;">
+        {{ user.first_name[0] if user.first_name else "U" }}
+    </div>
+    <h3 class="fw-bold">Edit Profile</h3>
+</div>
+            <form action="/profile/edit" method="POST">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="first_name" id="first_name" value="{{ user.first_name }}" placeholder="First Name" required>
+                    <label for="first_name">First Name</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="last_name" id="last_name" value="{{ user.last_name }}" placeholder="Last Name" required>
+                    <label for="last_name">Last Name</label>
+                </div>
+                <div class="form-floating mb-4">
+                    <input type="email" class="form-control" name="email" id="email" value="{{ user.email }}" placeholder="Email" required>
+                    <label for="email">Email Address</label>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100 py-2 fs-6 fw-bold shadow-sm">Update Profile</button>
+            </form>
+        </div>
+        
+        <div class="surface-card p-4 text-center border-danger">
+            <h5 class="text-danger fw-bold"><i class="bi bi-exclamation-triangle"></i> Danger Zone</h5>
+            <p class="text-muted small mb-3">Deleting your account is permanent. Ensure balances are settled.</p>
+            <form action="/profile/delete" method="POST" onsubmit="return confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.');">
+                <button type="submit" class="btn btn-danger-custom w-100 py-2 shadow-sm">Delete Account</button>
+            </form>
+        </div>
+
+    </div>
+    
+    <!-- Personal Transaction Ledger -->
+    <div class="col-md-7">
+        <div class="surface-card">
+            <div class="card-header border-bottom border-subtle p-4 d-flex justify-content-between align-items-center">
+                <h4 class="fw-bold mb-0">My Transaction Ledger</h4>
+                <span class="badge bg-primary rounded-pill">Total History</span>
+            </div>
+            <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
+                {% if ledger %}
+                    {% for item in ledger %}
+                    <div class="p-4 border-bottom border-subtle hover-bg-light transition-all">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="category-badge" style="background-color: {% if item.type == 'payment_sent' or item.type == 'expense_paid' %}var(--positive){% else %}var(--negative){% endif %}; color: white;">
+                                    <i class="bi {% if item.type == 'payment_sent' or item.type == 'payment_received' %}bi-cash-coin{% else %}bi-receipt{% endif %}"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-1 fw-bold text-primary">{{ item.description }}</p>
+                                    <p class="small text-muted mb-1">
+                                        {% if item.type == 'expense_paid' %}
+                                            You paid for the group
+                                        {% elif item.type == 'expense_owed' %}
+                                            You owe <strong class="text-primary">{{ item.other }}</strong>
+                                        {% elif item.type == 'payment_sent' %}
+                                            You paid <strong class="text-primary">{{ item.other }}</strong>
+                                        {% elif item.type == 'payment_received' %}
+                                            <strong class="text-primary">{{ item.other }}</strong> paid you
+                                        {% endif %}
+                                    </p>
+                                    <span class="badge bg-light text-muted border border-subtle shadow-sm">{{ item.group_name }}</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold fs-5 money-format {% if item.type == 'payment_sent' or item.type == 'expense_paid' %}text-positive{% else %}text-negative{% endif %}">
+                                    {% if item.type == 'payment_sent' or item.type == 'expense_paid' %}+{% else %}-{% endif %}₹{{ item.amount }}
+                                </span>
+                                <div class="mt-1 small text-muted">{{ item.date }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="p-5 text-center text-muted">
+                        <i class="bi bi-clock-history fs-1 mb-2 d-block"></i>
+                        <p class="mb-0">No personal transactions recorded yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

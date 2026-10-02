@@ -1,86 +1,46 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-import mysql.connector
+from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from dotenv import load_dotenv
 import os
 
-# Load database credentials from .env file
+from routers import auth, groups, expenses, payments, reminders, profile
+from utils import format_currency
+
 load_dotenv()
 
 app = FastAPI(title="Fair Share")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "supersecret-viva-key-123"))
 
-# Serve CSS/Images and HTML Templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
 templates = Jinja2Templates(directory="templates")
+templates.env.filters["currency"] = format_currency
 
-# Database Connection Helper
-def get_db_connection():
-    try:
-        return mysql.connector.connect(
-            host=os.getenv("DB_HOST", "localhost"),
-            user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD", "password"),
-            database=os.getenv("DB_NAME", "FairShare_DB")
-        )
-    except Exception as e:
-        print(f"Database Error: {e}")
-        return None
+app.include_router(auth.router)
+app.include_router(profile.router)
+app.include_router(groups.router)
+app.include_router(expenses.router)
+app.include_router(payments.router)
+app.include_router(reminders.router)
 
-# Route 1: Login Page
-@app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc):
+    if exc.status_code == 303:
+        pass # Handle redirects naturally
+    return templates.TemplateResponse("error.html", {"request": request, "status_code": exc.status_code, "detail": exc.detail}, status_code=exc.status_code)
 
-# Route 2: Handle Login Form (Simplified for Demo)
-@app.post("/login")
-async def login(username: str = Form(...)):
-    # Redirects to the dashboard of the logged-in user
-    return RedirectResponse(url=f"/dashboard/{username}", status_code=303)
+@app.exception_handler(500)
+async def internal_error_handler(request, exc):
+    import traceback
+    error_detail = traceback.format_exc() if hasattr(exc, '__traceback__') else str(exc)
+    return templates.TemplateResponse("error.html", {"request": request, "status_code": 500, "detail": error_detail}, status_code=500)
 
-# Route 3: The Dashboard (Analytics & Queries)
-@app.get("/dashboard/{username}", response_class=HTMLResponse)
-async def dashboard(request: Request, username: str):
-    conn = get_db_connection()
-    if not conn:
-        return templates.TemplateResponse("dashboard.html", {"request": request, "error": "Database not connected! Check your MySQL password in .env."})
-        
-    cursor = conn.cursor(dictionary=True)
-    
-    # Query 1: Get User Info
-    cursor.execute("SELECT * FROM Users WHERE user_name = %s", (username,))
-    user = cursor.fetchone()
-    
-    if not user:
-        return RedirectResponse(url="/", status_code=303) # User not found
-        
-    group_id = 1 # Assuming Group 1 ('Goa Trip') for this demo
-    
-    # Query 2: Who owes this user? (Using your trigger-maintained Balances table!)
-    cursor.execute("""
-        SELECT borrower.first_name, b.total_amount 
-        FROM Balances b 
-        JOIN Users borrower ON b.borrower_id = borrower.user_id 
-        WHERE b.lender_id = %s AND b.total_amount > 0 AND b.group_id = %s
-    """, (user['user_id'], group_id))
-    balances = cursor.fetchall()
-
-    # Query 3: Pie Chart Data (Aggregate Function)
-    cursor.execute("""
-        SELECT COALESCE(category, 'Uncategorized') as category, SUM(amount) as total 
-        FROM Expenses 
-        WHERE group_id = %s 
-        GROUP BY category
-    """, (group_id,))
-    chart_data = cursor.fetchall()
-    
-    conn.close()
-    
-    # Send all this database data to the HTML page
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request, 
-        "user": user, 
-        "balances": balances,
-        "chart_data": chart_data
-    })
+@app.get("/")
+async def root(request: Request):
+    from utils import get_current_user
+    user = get_current_user(request)
+    return templates.TemplateResponse("index.html", {"request": request, "user": user})

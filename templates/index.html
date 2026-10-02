@@ -1,22 +1,108 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow border-0">
+<!-- Hero Section -->
+<div class="row align-items-center mt-5 mb-5 pt-5 pb-5 surface-card text-primary rounded-5 shadow-lg position-relative overflow-hidden">
+    <!-- Decorative background circle -->
+    <div class="position-absolute top-0 end-0 surface-subtle opacity-10 rounded-circle" style="width: 400px; height: 400px; transform: translate(30%, -30%);"></div>
+    
+    <div class="col-lg-7 p-5 position-relative z-1">
+        <img src="/static/img/fs_icon.png" alt="FS Logo" style="height: 65px; margin-bottom: 10px;">
+        <h1 class="display-3 fw-bold mb-3 tracking-tight" style="font-family: system-ui, -apple-system, sans-serif;">
+            <span style="color: var(--text-primary); font-weight: 800;">Fair</span><span style="color: #00b488; font-weight: 800;">Share</span>
+        </h1>
+        <p class="lead mb-4 fs-4 text-muted">The easiest way to split bills, track shared expenses, and settle up with friends. No more awkward math.</p>
+        <div class="d-grid gap-3 d-sm-flex">
+            {% if request.session.get('user_id') %}
+                <a href="/groups" class="btn btn-primary-custom btn-lg px-5 py-3 fs-5" style="border-radius: 12px; font-weight: 600; padding: 12px 30px;">Go to Dashboard <i class="bi bi-arrow-right"></i></a>
+            {% else %}
+                <a href="/signup" class="btn btn-primary-custom btn-lg px-5 py-3 fs-5" style="border-radius: 12px; font-weight: 600; padding: 12px 30px;">Get Started <i class="bi bi-arrow-right"></i></a>
+                <a href="/login" class="btn btn-ghost btn-lg px-5 py-3 fs-5" style="border-radius: 12px; font-weight: 600; padding: 12px 30px;">Log In</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-5 text-center d-none d-lg-block position-relative z-1">
+        <img src="/static/img/landing_card.png" alt="Fair Share Card" class="img-fluid rounded-4 shadow-lg border border-3 border" style="width: 320px; object-fit: contain;">
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row g-4 py-5 mb-5">
+    <div class="col-md-4">
+        <div class="surface-card h-100 border-0 text-center">
             <div class="card-body p-5 text-center">
-                <img src="/static/img/fair_share_logo.png" alt="Logo" class="mb-4 rounded-circle shadow-sm" width="100">
-                <h2 class="fw-bold mb-4">Welcome Back</h2>
-                <form action="/login" method="POST">
-                    <div class="form-floating mb-3">
-                        <!-- Defaulted to alice_s from our SQL sample data -->
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required value="alice_s">
-                        <label for="username">Username (e.g., alice_s)</label>
-                    </div>
-                    <button class="btn btn-primary w-100 py-2 fw-bold" type="submit">Sign in</button>
-                </form>
-                <p class="text-muted mt-4 mb-0"><small>Built by Aditya, Advait & Arnav</small></p>
+                <div class="surface-subtle d-inline-block rounded-circle p-4 mb-4 shadow-sm">
+                    <i class="bi bi-calculator fs-1"></i>
+                </div>
+                <h3 class="fw-bold mb-3">Smart Splitting</h3>
+                <p class="text-muted fs-5">Split expenses equally, by exact amounts, or dynamically by percentage. We handle all the heavy math and rounding for you.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="surface-card h-100 border-0 text-center">
+            <div class="card-body p-5 text-center">
+                <div class="bg-success bg-opacity-10 text-success d-inline-block rounded-circle p-4 mb-4">
+                    <i class="bi bi-shield-check fs-1"></i>
+                </div>
+                <h3 class="fw-bold mb-3">Crash-Proof Triggers</h3>
+                <p class="text-muted fs-5">Balances are never calculated in code. They are maintained safely by native MySQL Database Triggers, making the system crash-proof and ACID compliant.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="surface-card h-100 border-0 text-center">
+            <div class="card-body p-5 text-center">
+                <div class="bg-warning bg-opacity-10 text-warning d-inline-block rounded-circle p-4 mb-4">
+                    <i class="bi bi-phone fs-1"></i>
+                </div>
+                <h3 class="fw-bold mb-3">Advanced Split Logic</h3>
+                <p class="text-muted fs-5">Split expenses equally, by exact amounts, or by custom percentages. Our backend algorithm naturally protects against fractional rounding errors.</p>
             </div>
         </div>
     </div>
 </div>
+
+<!-- How it works -->
+<div class="row justify-content-center mb-5 pb-5">
+    <div class="col-md-10 text-center">
+        <h2 class="display-5 fw-bold mb-5">How it works</h2>
+        <div class="row g-4 text-muted">
+            <div class="col-md-4">
+                <i class="bi bi-people-fill display-4 text-primary mb-3"></i>
+                <h4 class="fw-bold text-primary">1. Create a Group</h4>
+                <p>Create a group for your trip, apartment, or night out and invite your friends.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-receipt display-4 text-primary mb-3"></i>
+                <h4 class="fw-bold text-primary">2. Add Expenses</h4>
+                <p>Add what you paid for. We'll automatically calculate who owes what instantly.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-cash-coin display-4 text-primary mb-3"></i>
+                <h4 class="fw-bold text-primary">3. Settle Up</h4>
+                <p>Pay back your friends and record the payments. We simplify the debts automatically.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center text-muted border-top pt-5 pb-4 mt-5">
+    <h5 class="fw-bold text-primary mb-3">Fair Share &copy; 2026</h5>
+    <p class="mb-1 fs-5">Built by <span class="text-primary fw-bold">Aditya, Advait & Arnav</span> for the DBMS Mini-Project.</p>
+    <p class="small mt-3"><i class="bi bi-database"></i> Powered by Python, FastAPI, and MySQL.</p>
+</footer>
+
+<style>
+    .feature-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+    }
+    .tracking-tight {
+        letter-spacing: -0.04em;
+    }
+</style>
 {% endblock %}

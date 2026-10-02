@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center stagger-item mt-5">
+    <div class="col-md-5">
+        <div class="surface-card p-4 text-center">
+            <h3 class="fw-bold mb-3" style="color: var(--text-primary);">Welcome Back</h3>
+            
+            {% if error %}
+            <div class="alert alert-danger alert-auto-dismiss p-3 mb-4 rounded-3 d-flex align-items-center" role="alert" aria-live="assertive">
+                <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i> 
+                <span class="text-start">{{ error }}</span>
+            </div>
+            {% endif %}
+            
+            {% if msg %}
+            <div class="alert alert-success alert-auto-dismiss p-3 mb-4 rounded-3 d-flex align-items-center" role="alert" aria-live="polite">
+                <i class="bi bi-check-circle-fill fs-5 me-2"></i> 
+                <span class="text-start">{{ msg }}</span>
+            </div>
+            {% endif %}
+
+            <form action="/login" method="POST">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="email" id="email" placeholder="Username or Email" required>
+                    <label for="email"><i class="bi bi-person"></i> Username / Email</label>
+                </div>
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+                    <label for="password"><i class="bi bi-lock"></i> Password</label>
+                </div>
+                <button class="btn btn-primary-custom fw-bold text-white shadow-sm w-100 py-3 fs-5" type="submit">Log In</button>
+            </form>
+            <p class="mt-4 mb-0 text-muted">New here? <a href="/signup" class="fw-bold">Create an account</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
