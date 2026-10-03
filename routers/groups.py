@@ -216,7 +216,7 @@ async def request_join(request: Request, group_id: int = Form(...)):
     cursor.execute("SELECT * FROM Group_Members WHERE group_id = %s AND user_id = %s", (group_id, user['user_id']))
     if cursor.fetchone():
         conn.close()
-        return RedirectResponse(url=f"/groups/{group_id}?error=You are already a member.", status_code=303)
+        return RedirectResponse(url=f"/group/{group_id}?error=You are already a member.", status_code=303)
         
     # Check if request already exists
     cursor.execute("SELECT * FROM Group_Requests WHERE group_id = %s AND user_id = %s AND status = 'Pending'", (group_id, user['user_id']))
@@ -240,7 +240,7 @@ async def approve_request(request: Request, group_id: int, req_user_id: int):
     member = cursor.fetchone()
     if not member or member['role'] != 'Admin':
         conn.close()
-        return RedirectResponse(url=f"/groups/{group_id}?error=Only admins can approve requests.", status_code=303)
+        return RedirectResponse(url=f"/group/{group_id}?error=Only admins can approve requests.", status_code=303)
         
     # Add to group
     try:
@@ -251,7 +251,7 @@ async def approve_request(request: Request, group_id: int, req_user_id: int):
         conn.rollback()
     
     conn.close()
-    return RedirectResponse(url=f"/groups/{group_id}?msg=User approved and added to group.", status_code=303)
+    return RedirectResponse(url=f"/group/{group_id}?msg=User approved and added to group.", status_code=303)
 
 @router.post("/groups/{group_id}/reject/{req_user_id}")
 async def reject_request(request: Request, group_id: int, req_user_id: int):
@@ -267,4 +267,4 @@ async def reject_request(request: Request, group_id: int, req_user_id: int):
         conn.commit()
     
     conn.close()
-    return RedirectResponse(url=f"/groups/{group_id}?msg=Request rejected.", status_code=303)
+    return RedirectResponse(url=f"/group/{group_id}?msg=Request rejected.", status_code=303)

@@ -19,14 +19,14 @@ async def send_reminder(request: Request, group_id: int = Form(...), borrower_id
         # Rate limit check: sent within last 24h
         cursor.execute("""
             SELECT sent_at FROM Reminders 
-            WHERE sent_by_user_id = %s AND sent_to_user_id = %s AND sent_at > NOW() - INTERVAL 10 SECOND
+            WHERE sender_id = %s AND receiver_id = %s AND sent_at > NOW() - INTERVAL 10 SECOND
             ORDER BY sent_at DESC LIMIT 1
         """, (user['user_id'], borrower_id))
         
         if cursor.fetchone():
             raise Exception("Please wait a moment before sending another reminder.")
 
-        cursor.execute("INSERT INTO Reminders (sent_by_user_id, sent_to_user_id, expense_id) VALUES (%s, %s, %s)", 
+        cursor.execute("INSERT INTO Reminders (sender_id, receiver_id, expense_id) VALUES (%s, %s, %s)", 
                        (user['user_id'], borrower_id, exp['expense_id']))
         conn.commit()
     except Exception as e:
@@ -48,10 +48,10 @@ async def get_notifications(request: Request):
         query = """
             SELECT 'reminder' as type, r.sent_at as timestamp, u.first_name as actor, g.group_name, 'sent you a reminder to settle up.' as action, r.reminder_id as id
             FROM Reminders r
-            JOIN Users u ON r.sent_by_user_id = u.user_id
+            JOIN Users u ON r.sender_id = u.user_id
             JOIN Expenses e ON r.expense_id = e.expense_id
             JOIN Groups_Table g ON e.group_id = g.group_id
-            WHERE r.sent_to_user_id = %s
+            WHERE r.receiver_id = %s
             
             UNION ALL
             
