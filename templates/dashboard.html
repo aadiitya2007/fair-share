@@ -4,7 +4,7 @@
 <div class="row align-items-center mb-4">
     <div class="col-md-7 mb-3 mb-md-0">
         <a href="/groups" class="text-decoration-none text-muted small mb-3 d-inline-block"><i class="bi bi-arrow-left"></i> Back to My Groups</a>
-        <h1 class="fw-bold mb-2 text-primary">{{ group.group_name }}</h1>
+                <h1 class="fw-bold mb-2 text-primary">{{ group.group_name }} <span class="badge bg-secondary fs-6 align-middle ms-2">ID: {{ group.group_id }}</span></h1>
         <div class="d-flex align-items-center flex-wrap gap-2">
             <span class="text-muted small me-1"><i class="bi bi-people-fill"></i> Members:</span>
             {% for m in members %}
