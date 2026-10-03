@@ -2,11 +2,11 @@ from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
-from db import get_db_connection
-from utils import get_current_user
+from app.db import get_db_connection
+from app.utils import get_current_user
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.get("/login", response_class=HTMLResponse)

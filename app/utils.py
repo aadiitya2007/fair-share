@@ -1,5 +1,5 @@
 from fastapi import Request, HTTPException, status
-from db import get_db_connection
+from app.db import get_db_connection
 
 def get_current_user(request: Request):
     user_id = request.session.get("user_id")

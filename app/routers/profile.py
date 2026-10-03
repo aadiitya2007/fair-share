@@ -2,11 +2,11 @@ from fastapi import APIRouter, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
-from db import get_db_connection
-from utils import require_login, format_currency
+from app.db import get_db_connection
+from app.utils import require_login, format_currency
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 templates.env.filters["currency"] = format_currency
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

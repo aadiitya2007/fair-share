@@ -7,17 +7,17 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from dotenv import load_dotenv
 import os
 
-from routers import auth, groups, expenses, payments, reminders, profile
-from utils import format_currency
+from app.routers import auth, groups, expenses, payments, reminders, profile
+from app.utils import format_currency
 
 load_dotenv()
 
 app = FastAPI(title="Fair Share")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "supersecret-viva-key-123"))
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 templates.env.filters["currency"] = format_currency
 
 app.include_router(auth.router)
@@ -41,6 +41,6 @@ async def internal_error_handler(request, exc):
 
 @app.get("/")
 async def root(request: Request):
-    from utils import get_current_user
+    from app.utils import get_current_user
     user = get_current_user(request)
     return templates.TemplateResponse("index.html", {"request": request, "user": user})
