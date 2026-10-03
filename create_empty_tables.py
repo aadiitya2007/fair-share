@@ -9,7 +9,8 @@ def create_schema():
         host=os.getenv("DB_HOST", "localhost"),
         user=os.getenv("DB_USER", "root"),
         password=os.getenv("DB_PASSWORD", "password"),
-        database=os.getenv("DB_NAME", "FairShare_DB")
+        database=os.getenv("DB_NAME", "FairShare_DB"),
+        port=int(os.getenv("DB_PORT", 3306))
     )
     cursor = conn.cursor()
 
