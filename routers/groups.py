@@ -107,6 +107,16 @@ async def group_dashboard(request: Request, group_id: int, msg: str = None, erro
     """, (group_id,))
     members = cursor.fetchall()
     
+    # Check Admin Role for pending requests
+    cursor.execute("SELECT role FROM Group_Members WHERE user_id = %s AND group_id = %s", (user['user_id'], group_id))
+    role_res = cursor.fetchone()
+    role = role_res['role'] if role_res else 'Member'
+    
+    pending_requests = []
+    if role == 'Admin':
+        cursor.execute("SELECT gr.user_id, u.first_name, u.last_name, u.user_name FROM Group_Requests gr JOIN Users u ON gr.user_id = u.user_id WHERE gr.group_id = %s AND gr.status = 'Pending'", (group_id,))
+        pending_requests = cursor.fetchall()
+    
     # Balances for current user
     cursor.execute("""
         SELECT borrower.user_id, borrower.first_name, b.total_amount 
@@ -157,7 +167,7 @@ async def group_dashboard(request: Request, group_id: int, msg: str = None, erro
     return templates.TemplateResponse("dashboard.html", {
         "request": request, "user": user, "group": group, "members": members,
         "owed_to_user": owed_to_user, "user_owes": user_owes, "expenses": expenses,
-        "chart_data": chart_data, "msg": msg, "error": error
+        "chart_data": chart_data, "msg": msg, "error": error, "pending_requests": pending_requests, "role": role
     })
     
 @router.post("/group/{group_id}/add_member")
