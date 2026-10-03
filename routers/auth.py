@@ -16,13 +16,21 @@ async def login_page(request: Request, msg: str = None):
 @router.post("/login")
 async def login(request: Request, email: str = Form(...), password: str = Form(...)):
     conn = get_db_connection()
+    if not conn:
+        return templates.TemplateResponse("login.html", {"request": request, "error": "Database Connection Failed. Check Railway Variables!"})
     cursor = conn.cursor(dictionary=True)
     # Authenticate via email or username
+    user = None
     try:
-        cursor.execute("SELECT * FROM Users WHERE (email = %s OR user_name = %s) AND (deleted_at IS NULL)", (email, email))
-    except:
-        cursor.execute("SELECT * FROM Users WHERE email = %s OR user_name = %s", (email, email))
-    user = cursor.fetchone()
+        try:
+            cursor.execute("SELECT * FROM Users WHERE (email = %s OR user_name = %s) AND (deleted_at IS NULL)", (email, email))
+        except:
+            cursor.execute("SELECT * FROM Users WHERE email = %s OR user_name = %s", (email, email))
+        user = cursor.fetchone()
+    except Exception as e:
+        conn.close()
+        return templates.TemplateResponse("login.html", {"request": request, "error": "Database is empty! You must create the tables first."})
+        
     conn.close()
 
     if user and pwd_context.verify(password, user['password_hash']):
