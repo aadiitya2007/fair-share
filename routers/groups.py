@@ -189,3 +189,72 @@ async def add_member(request: Request, group_id: int, new_username: str = Form(.
     finally:
         conn.close()
     return RedirectResponse(url=f"/group/{group_id}?msg={msg}", status_code=303)
+
+@router.post("/groups/request_join")
+async def request_join(request: Request, group_id: int = Form(...)):
+    user = require_login(request)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    # Check if group exists
+    cursor.execute("SELECT * FROM Groups_Table WHERE group_id = %s", (group_id,))
+    if not cursor.fetchone():
+        conn.close()
+        return RedirectResponse(url="/groups?error=Group not found.", status_code=303)
+        
+    # Check if already a member
+    cursor.execute("SELECT * FROM Group_Members WHERE group_id = %s AND user_id = %s", (group_id, user['user_id']))
+    if cursor.fetchone():
+        conn.close()
+        return RedirectResponse(url=f"/groups/{group_id}?error=You are already a member.", status_code=303)
+        
+    # Check if request already exists
+    cursor.execute("SELECT * FROM Group_Requests WHERE group_id = %s AND user_id = %s AND status = 'Pending'", (group_id, user['user_id']))
+    if cursor.fetchone():
+        conn.close()
+        return RedirectResponse(url="/groups?msg=Join request already pending.", status_code=303)
+        
+    cursor.execute("INSERT INTO Group_Requests (group_id, user_id) VALUES (%s, %s)", (group_id, user['user_id']))
+    conn.commit()
+    conn.close()
+    return RedirectResponse(url="/groups?msg=Join request sent to group admins!", status_code=303)
+
+@router.post("/groups/{group_id}/approve/{req_user_id}")
+async def approve_request(request: Request, group_id: int, req_user_id: int):
+    user = require_login(request)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    # Check if admin
+    cursor.execute("SELECT role FROM Group_Members WHERE user_id = %s AND group_id = %s", (user['user_id'], group_id))
+    member = cursor.fetchone()
+    if not member or member['role'] != 'Admin':
+        conn.close()
+        return RedirectResponse(url=f"/groups/{group_id}?error=Only admins can approve requests.", status_code=303)
+        
+    # Add to group
+    try:
+        cursor.execute("INSERT INTO Group_Members (group_id, user_id, role) VALUES (%s, %s, 'Member')", (group_id, req_user_id))
+        cursor.execute("UPDATE Group_Requests SET status = 'Approved' WHERE group_id = %s AND user_id = %s", (group_id, req_user_id))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+    
+    conn.close()
+    return RedirectResponse(url=f"/groups/{group_id}?msg=User approved and added to group.", status_code=303)
+
+@router.post("/groups/{group_id}/reject/{req_user_id}")
+async def reject_request(request: Request, group_id: int, req_user_id: int):
+    user = require_login(request)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Check if admin
+    cursor.execute("SELECT role FROM Group_Members WHERE user_id = %s AND group_id = %s", (user['user_id'], group_id))
+    member = cursor.fetchone()
+    if member and member[0] == 'Admin':
+        cursor.execute("UPDATE Group_Requests SET status = 'Rejected' WHERE group_id = %s AND user_id = %s", (group_id, req_user_id))
+        conn.commit()
+    
+    conn.close()
+    return RedirectResponse(url=f"/groups/{group_id}?msg=Request rejected.", status_code=303)
