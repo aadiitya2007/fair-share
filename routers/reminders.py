@@ -70,9 +70,25 @@ async def get_notifications(request: Request):
             JOIN Groups_Table g ON e.group_id = g.group_id
             WHERE es.user_id = %s AND e.paid_by_user_id != %s
             
+            UNION ALL
+            
+            SELECT 'join_request' as type, gr.created_at as timestamp, u.first_name as actor, g.group_name, 'requested to join.' as action, gr.request_id as id
+            FROM Group_Requests gr
+            JOIN Users u ON gr.user_id = u.user_id
+            JOIN Groups_Table g ON gr.group_id = g.group_id
+            JOIN Group_Members gm ON g.group_id = gm.group_id
+            WHERE gm.user_id = %s AND gm.role = 'Admin' AND gr.status = 'Pending'
+            
+            UNION ALL
+            
+            SELECT 'join_update' as type, gr.created_at as timestamp, 'Group Admin' as actor, g.group_name, concat('has ', lower(gr.status), ' your request.') as action, gr.request_id as id
+            FROM Group_Requests gr
+            JOIN Groups_Table g ON gr.group_id = g.group_id
+            WHERE gr.user_id = %s AND gr.status IN ('Approved', 'Rejected')
+            
             ORDER BY timestamp DESC LIMIT 20
         """
-        cursor.execute(query, (user['user_id'], user['user_id'], user['user_id'], user['user_id']))
+        cursor.execute(query, (user['user_id'], user['user_id'], user['user_id'], user['user_id'], user['user_id'], user['user_id']))
         notifs = cursor.fetchall()
         
         # Get the latest timestamp of any activity across the user's groups to trigger live UI reloads

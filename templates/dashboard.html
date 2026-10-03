@@ -57,6 +57,36 @@
     {% endif %}
 </div>
 
+
+            {% if role == 'Admin' and pending_requests %}
+            <div class="col-12 mb-4">
+                <div class="surface-card p-4 border border-warning shadow-sm">
+                    <h5 class="fw-bold text-warning mb-3"><i class="bi bi-person-plus-fill me-2"></i>Pending Join Requests</h5>
+                    <div class="list-group list-group-flush">
+                        {% for req in pending_requests %}
+                        <div class="list-group-item px-0 py-2 bg-transparent border-0 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar-small bg-warning text-dark">{{ req.first_name[0] }}</div>
+                                <div>
+                                    <p class="mb-0 fw-bold">{{ req.first_name }} {{ req.last_name }}</p>
+                                    <small class="text-muted">Wants to join this group</small>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <form action="/groups/{{ group.group_id }}/approve/{{ req.user_id }}" method="POST">
+                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">Approve</button>
+                                </form>
+                                <form action="/groups/{{ group.group_id }}/reject/{{ req.user_id }}" method="POST">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
 <!-- Balances Row -->
 <div class="row g-4 mb-4">
     <!-- Balances to Collect -->
