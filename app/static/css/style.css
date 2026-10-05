@@ -103,7 +103,7 @@ body {
 
 /* Buttons */
 .btn-primary-custom {
-    background-color: var(--brand);
+    background-color: var(--brand) !important;
     color: #ffffff !important;
     border: none;
     border-radius: var(--radius-pill);
@@ -111,6 +111,8 @@ body {
     transition: transform 0.1s ease, filter 0.2s ease;
 }
 .btn-primary-custom:hover:not(:disabled) {
+    background-color: var(--brand) !important;
+    color: #ffffff !important;
     filter: brightness(1.1);
     transform: translateY(-1px);
 }
@@ -118,22 +120,28 @@ body {
     transform: translateY(1px) scale(0.98);
 }
 .btn-danger-custom {
-    background-color: var(--negative);
+    background-color: var(--negative) !important;
     color: #ffffff !important;
     border: none;
     border-radius: var(--radius-pill);
     font-weight: 600;
     transition: all 0.2s ease;
 }
+.btn-danger-custom:hover:not(:disabled) {
+    background-color: var(--negative) !important;
+    color: #ffffff !important;
+    filter: brightness(1.1);
+}
 .btn-ghost {
-    background-color: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--border-default);
+    background-color: transparent !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-default) !important;
     border-radius: var(--radius-pill);
 }
 .btn-ghost:hover {
-    background-color: var(--bg-subtle);
-    color: var(--text-primary);
+    background-color: var(--bg-subtle) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-strong) !important;
 }
 
 /* Avatar Circle */
