@@ -9,10 +9,28 @@
 
 ---
 
-## 📖 The Problem
-College students, roommates, and friends frequently share expenses for trips, groceries, and dinners. Tracking who owes whom on paper or Excel quickly becomes a mathematical nightmare. 
+## 📖 Problem Statement
+Managing shared expenses among friends, roommates, college groups, or other communities can become complicated when several people contribute different amounts toward common expenses. In a typical group, expenses such as groceries, rent, travel, food, subscriptions, or utility bills may be paid by different individuals and shared among different combinations of members. Keeping track of these transactions manually through notes, spreadsheets, or messaging applications can result in calculation errors, missing records, and confusion about who owes whom and how much.
 
-**Fair Share** completely automates this. You add an expense, and the system's database automatically calculates exactly who owes whom, cancels out reverse debts, and provides a real-time dashboard of your exact financial position.
+The problem becomes more complex when a group has multiple expenses over a period of time. For example, if Gopal pays ₹900 for dinner shared by three members, Virat pays ₹600 for groceries shared by two members, and Rohit later repays Gopal, simply recording the transactions is not sufficient. The system must maintain the individual share of every expense, identify the person who initially paid, calculate the outstanding amount for each member, and keep track of subsequent repayments. Without a structured system, it becomes difficult to maintain an accurate and consistent record of these financial relationships.
+
+Another challenge is that users may belong to multiple groups simultaneously. A person may be part of a college trip group, a roommate group, and a group of friends, each having completely different expenses and members. Therefore, the system must ensure that expenses and settlements remain associated with the correct group and participants. It should also prevent duplicate or inconsistent records and provide a reliable way to retrieve historical transactions.
+
+Our project addresses this problem by designing a relational Group Expense Management System, inspired by the core functionality of applications such as Splitwise. The primary objective is to use DBMS concepts to efficiently store, relate, and process information about users, groups, expenses, individual expense shares, payments, and reminders.
+
+## 💡 Proposed Solution
+The proposed system provides a centralized database through which users can create or participate in groups and record their shared expenses. The database is structured around interconnected entities such as Users, Groups, Expenses, Expense Splits, Payments, and Reminders. A separate group-membership relationship allows a user to participate in multiple groups while maintaining the members associated with each group.
+
+When an expense is added, the system records important information such as the total amount, description, group, and user who paid the expense. The expense is then divided among the relevant members and it shows exact amount owed by each participant. This allows the system to determine individual liabilities instead of simply storing the total expense.
+
+The system also maintains Payments/Settlements, allowing users to record when one member pays another member back. For example, if Bob owes Alice ₹300 and subsequently pays her ₹300, the payment is stored as a separate transaction. This provides a complete history of both expenses and repayments. The Reminders component allows one user to remind another about an outstanding amount, providing an additional mechanism for managing pending payments.
+
+The relational structure provides several advantages. Data consistency and integrity are maintained through primary keys, foreign keys, composite keys, and appropriate relationships between tables. The design also reduces unnecessary data duplication by separating users, groups, expenses, and transactions into logically independent tables. M:N relationships such as users joining multiple groups and users participating in multiple expense splits are handled through junction tables.
+
+The database can further support SQL queries to generate useful information such as total expenses of a group, individual contributions, outstanding balances, payment history, group membership, and users with pending amounts. This makes the project more than a simple expense-recording application; it demonstrates practical applications of relational database concepts such as normalization, entity relationships, joins, aggregation, and transaction management. The system is designed with industry-level data integrity using primary and foreign key constraints, validation rules, and database triggers. Automated triggers handle critical updates and validations in real time, reducing manual intervention, maintaining consistency across related tables, and enabling efficient transaction management in real-world scenarios.
+
+## 🗂️ ER Diagram
+You can view the full Entity-Relationship Diagram here: **[ER Diagram (PDF)](docs/ER_Diagram.pdf)**
 
 ## ✨ Features
 * **Authentication:** Secure user signup and login with `bcrypt` password hashing.
@@ -63,7 +81,7 @@ This project is currently deployed using free-tier cloud services (Render for th
 
 ## 🗄️ Database Design
 
-Please see [docs/DATABASE.md](docs/DATABASE.md) for the ER Diagram and full table schemas. 
+Please see [docs/DATABASE.md](docs/DATABASE.md) for full table schemas. 
 
 **Key Design Decisions:**
 * **The `Balances` Cache Table:** Calculating debts recursively across thousands of transactions is an $O(N)$ operation. We use a cache table (`Balances`) to make dashboard loads $O(1)$.
