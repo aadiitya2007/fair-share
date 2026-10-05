@@ -24,10 +24,23 @@ College students, roommates, and friends frequently share expenses for trips, gr
 * **Real-time Notifications:** In-app toast notifications and auto-reloading UI when someone requests to join, adds an expense, or settles a debt.
 * **Dark Mode:** Seamless light/dark mode toggle.
 
+## ☁️ Live Demo (Free Tier Notice)
+This project is currently deployed using free-tier cloud services (Render for the web app, Aiven for MySQL). To conserve resources, these providers automatically power down the server and database after a period of inactivity. 
+
+**If you are reviewing this project and the site takes a few minutes to load, or throws a connection error:** Please do not consider this a bug! It means the cloud services are waking up from cold storage. The owner may need to manually click "Power On" in the database console to restore access.
+
 ## 📸 Screenshots
-*(Add your screenshots here)*
-* [Dashboard / My Groups](docs/screenshots/dashboard.png)
-* [Group Details & Balances](docs/screenshots/group_details.png)
+### Landing Page
+![Landing Page](docs/screenshots/landing.png)
+
+### Login Page
+![Login Page](docs/screenshots/login.png)
+
+### Dashboard (Light/Dark Mode)
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Group Details & Balances
+![Group Details](docs/screenshots/group_details.png)
 
 ---
 
@@ -121,6 +134,6 @@ python tests/test_balances.py
 Building this project taught me how to bridge the gap between frontend templates and robust relational databases. I learned how to manage complex many-to-many state, write native database triggers to offload processing from Python, and protect against race conditions using transactions. 
 
 ---
-**Developed by:** Aditya Agarrwal  
+**Developed by:** Aditya Agarrwal, Advait Ambarkar, Arnav Badhe
 **Institution:** Sardar Patel Institute of Technology (SPIT)  
 **License:** [MIT](LICENSE)
