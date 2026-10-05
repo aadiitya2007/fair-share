@@ -42,6 +42,9 @@ This project is currently deployed using free-tier cloud services (Render for th
 ### Group Details & Balances
 ![Group Details](docs/screenshots/group_details.png)
 
+### User Profile & Ledger
+![User Profile](docs/screenshots/profile.png)
+
 ---
 
 ## 🛠️ Tech Stack & Architecture
