@@ -139,18 +139,18 @@ WHERE email = ?;
 -- It provides a quick, read-only snapshot of every user's net financial standing in each group.
 CREATE OR REPLACE VIEW vw_group_financial_summary AS
 SELECT 
-    g.name AS group_name,
-    u.username,
-    u.full_name,
-    COALESCE(SUM(b.amount), 0) AS total_amount_owed_to_others
+    g.group_name,
+    u.user_name,
+    u.first_name,
+    COALESCE(SUM(b.total_amount), 0) AS total_amount_owed_to_others
 FROM 
-    Groups g
+    Groups_Table g
 JOIN 
     Group_Members gm ON g.group_id = gm.group_id
 JOIN 
     Users u ON gm.user_id = u.user_id
 LEFT JOIN 
-    Balances b ON b.group_id = g.group_id AND b.debtor_id = u.user_id
+    Balances b ON b.group_id = g.group_id AND b.borrower_id = u.user_id
 GROUP BY 
     g.group_id, u.user_id;
 
