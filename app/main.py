@@ -33,10 +33,10 @@ async def http_exception_handler(request, exc):
         pass # Handle redirects naturally
     return templates.TemplateResponse("error.html", {"request": request, "status_code": exc.status_code, "detail": exc.detail}, status_code=exc.status_code)
 
-@app.exception_handler(500)
+@app.exception_handler(Exception)
 async def internal_error_handler(request, exc):
     import traceback
-    error_detail = traceback.format_exc() if hasattr(exc, '__traceback__') else str(exc)
+    error_detail = "The database server is currently disconnected or asleep due to cloud inactivity. Please wait 1-2 minutes and try again, or contact the group administrator to manually power on the server."
     return templates.TemplateResponse("error.html", {"request": request, "status_code": 500, "detail": error_detail}, status_code=500)
 
 @app.get("/")
