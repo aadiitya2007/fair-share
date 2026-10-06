@@ -17,7 +17,7 @@ async def login_page(request: Request, msg: str = None):
 async def login(request: Request, email: str = Form(...), password: str = Form(...)):
     conn = get_db_connection()
     if not conn:
-        return templates.TemplateResponse("login.html", {"request": request, "error": "Database Connection Failed. Check Railway Variables!"})
+        return templates.TemplateResponse("login.html", {"request": request, "error": "Database Connection Failed. Check Aiven Variables!"})
     cursor = conn.cursor(dictionary=True)
     # Authenticate via email or username
     user = None
