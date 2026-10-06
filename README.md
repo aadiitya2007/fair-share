@@ -1,5 +1,8 @@
 # 💸 Fair Share
 
+**🌐 Live Deployment Link:** [https://fair-share-lga4.onrender.com/](https://fair-share-lga4.onrender.com/)
+
+
 **A lightning-fast, Splitwise-style group expense tracker built for real-time settlements.**
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
@@ -43,6 +46,8 @@ You can view the full Entity-Relationship Diagram here: **[ER Diagram (PDF)](doc
 * **Dark Mode:** Seamless light/dark mode toggle.
 
 ## ☁️ Live Demo (Free Tier Notice)
+**🌐 Live Deployment Link:** [https://fair-share-lga4.onrender.com/](https://fair-share-lga4.onrender.com/)
+
 This project is currently deployed using free-tier cloud services (Render for the web app, Aiven for MySQL). To conserve resources, these providers automatically power down the server and database after a period of inactivity. 
 
 **If you are reviewing this project and the site takes a few minutes to load, or throws a connection error:** Please do not consider this a bug! It means the cloud services are waking up from cold storage. The owner may need to manually click "Power On" in the database console to restore access.
