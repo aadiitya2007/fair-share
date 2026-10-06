@@ -35,15 +35,21 @@ The database can further support SQL queries to generate useful information such
 ## 🗂️ ER Diagram
 You can view the full Entity-Relationship Diagram here: **[ER Diagram (PDF)](docs/ER_Diagram.pdf)**
 
-## ✨ Features
+## ✨ Core Features
 * **Authentication:** Secure user signup and login with `bcrypt` password hashing.
-* **Groups:** Create groups (e.g., "Goa Trip") and invite friends securely via Group IDs.
-* **Join Requests:** Users can request to join groups, which Admins can approve or reject.
-* **Expense Splitting:** Add expenses and split them across multiple members simultaneously.
-* **Intelligent Debt Netting:** If Bob owes Alice ₹300, and Alice borrows ₹100 from Bob, the database automatically nets it out to Bob owing Alice ₹200.
-* **Peer-to-peer Settlements:** Record direct payments to settle active debts.
-* **Real-time Notifications:** In-app toast notifications and auto-reloading UI when someone requests to join, adds an expense, or settles a debt.
-* **Dark Mode:** Seamless light/dark mode toggle.
+* **Expense Splitting:** Add expenses and split them dynamically across multiple group members.
+* **Intelligent Debt Netting:** The database mathematically nets out reverse-direction debts (e.g., if Bob owes Alice ₹300 and pays her ₹100, the system automatically nets the remaining debt to ₹200).
+* **Peer-to-peer Settlements:** Record direct transactions to seamlessly settle active debts.
+* **Dark Mode:** Integrated light/dark mode toggle for a modern UI experience.
+
+## 🌟 Special Technical Features
+In addition to basic CRUD operations, we implemented several advanced features to ensure structural integrity and improve the user experience:
+
+* **⚡ Live Updates (Long Polling):** The UI updates automatically within 10 seconds without the user needing to refresh the page, utilizing background JavaScript polling.
+* **🔔 Interactive Toast Notifications:** When the background polling detects a new join request, expense, or payment, the user is instantly alerted via a pop-up toast notification on their screen.
+* **🔒 Group Access Control:** Users cannot simply force their way into groups. They must submit a "Join Request" using a Group ID, which the Group Admin can then formally Approve or Reject.
+* **📊 Complex Data Aggregation:** The profile transaction ledger seamlessly combines data from completely different tables (Expenses, Payments, Reminders) using massive `UNION ALL` SQL queries to provide a unified chronological feed.
+* **🛡️ ACID Database Transactions:** Critical operations (like inserting expenses and splits) are wrapped in strict SQL Transactions (`START TRANSACTION` and `COMMIT`). If the server crashes mid-way, MySQL automatically rolls back the operation to prevent corrupted partial data.
 
 ## ☁️ Live Demo (Free Tier Notice)
 **🌐 Live Deployment Link:** [https://fair-share-lga4.onrender.com/](https://fair-share-lga4.onrender.com/)
